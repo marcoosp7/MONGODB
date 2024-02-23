@@ -1,0 +1,84 @@
+/*  CONEXION A LA BDD   */
+    require "vendor/autoload.php";
+    try {
+        $cliente = new MongoDB\Client("mongodb://localhost:27017");
+
+        // la bdd va a ser la que creó alfredo en el ej de ejemplo
+        $bdd = $cliente->nombreBdd;
+
+        // Imprimir un mensaje de conexión exitosa
+        echo "Conexión a la base de datos MongoDB establecida correctamente.";
+
+        // NO PIDE QUE HAGA NADA CON LA BDD SOLO CONECTARME
+        
+    } catch (Exception $e) {
+        // Capturar cualquier excepción que ocurra durante la conexión
+        echo "Error al conectar a la base de datos MongoDB: " . $e->getMessage();
+    }
+
+
+
+
+/*  INSERTAR  VARIOS  */
+    $res = $bd->nombreTabla->insertMany( [
+                [ "nombre" => "marcos", "edad" => 24, "correo" => "mark@gmail.com"],    // la edad la almacenaba como string pero para el 11 tienen que ser enteros
+                [ "nombre" => "oscar", "edad" => 22, "correo" => "oscar@gmail.com"],
+                [ "nombre" => "ryo", "edad" => 21, "correo" => "ryo@gmail.com"],
+            ] );
+
+
+
+/*  INSERTAR UNO    */
+    $res = $bd->nombreTabla->insertOne(["nombre" => "marcos", "edad"=>24]);
+
+
+
+/*  BUSCAR UNO  */
+    $res = $bd->nombreTabla->findOne( [ "id"=> "1230A" ] );
+
+
+/*  BUSCAR VARIOS (filtrar) */
+    $resultado = $coleccion->find(['ciudad' => 'Málaga']);
+
+
+/*  LEER TODOS  */
+    $rdo = $bd->nombreTabla->find();        // devuelve un array, usar for each
+
+
+
+/*  MODIFICAR   */
+    $updateResult = $bd->nombreTabla->updateOne(
+			[ 'nombre' => 'Ana' ],
+			[ '$set'   => [ 'saldo' => '700' ], ['edad' => 20] ]
+		);
+
+
+
+/*  ELIMINAR   UNO */
+    $deleteResult = $bd->nombreTabla->deleteOne( [ "id" => "000A" ] ) ;
+
+
+
+/*  ELIMINAR VARIOS */
+    $deleteResult = $bd->nombreTabla->deleteMany( [ "nombre" => "Alfredo" ] );
+
+
+
+/*   INDICE    */
+    // Creo un índice en la colección "usuarios" para el campo "edad"
+    $bd->usuarios->createIndex(['edad' => 1]);  // el 1 lo ordena de forma ascendente, -1 lo haria descendente
+
+
+
+/*  ORDENAR */
+    $usuariosOrdenados = $coleccion->find([], ['sort' => ['edad' => 1]]);   // ascendente
+
+
+
+/*  PROYECCION DE CAMPOS  (mostar solo X campos)  */
+    $usuarios = $bd->usuarios->find([], ['projection' => ['nombre' => 1, 'correo' => 1, '_id' => 0]]);  // el 0 EXCLUYE el id el 1 incluye los campos
+
+
+/*  CONTEO  */
+    $totalDocumentos = $nombreColeccion->countDocuments();  // devuelve cuantos documentos hay en la tabla 
+    $totalDocumentosFiltrados = $coleccion->count(['campo' => 'valor']);    // devuelve cuantos documentos cumple con esa condicion
